@@ -1,6 +1,7 @@
 import os
 import io
 import glob
+import time
 import random
 import re
 import tkinter as tk
@@ -83,7 +84,7 @@ class QuizScreen(tk.Tk):
         self.label_birds_remaining = tk.Label(font = ("Helvetica", 12, "normal"))
         self.label_birds_remaining.grid(row = 8, column = 1, pady = 10)
        # buttons
-        self.next_button = tk.Button(text = "Next", command = self.next_bird)
+        self.next_button = tk.Button(text = "Skip", command = self.next_bird)
         self.next_button.grid(row = 5, column = 2)
         self.reveal_button = tk.Button(text = "Reveal", command = self.show_image)
         self.reveal_button.grid(row = 5, column = 1)
@@ -117,6 +118,10 @@ class QuizScreen(tk.Tk):
     def show_image(self):
         self.label_image.configure(image = self.tk_img)
         self.label_image.grid(row = 1, column = 0, columnspan = 3)
+        self.label_image.update()
+        self.reveal_button.grid_remove()
+        self.reveal_button.update()
+        time.sleep(2)
         self.label_common_name.configure(text=bird_name_from_filename(self.current_bird))
         self.label_latin_name.configure(text=self.latin_name)
         self.label_credits.config(text=f"Recorded in {self.recording_place} by {self.recording_artist}\nMacaulay Library, {self.recording_id}")
@@ -178,6 +183,7 @@ class QuizScreen(tk.Tk):
 
     def next_bird(self):
         self.update_percentage_score()
+        self.reveal_button.grid(row = 5, column = 1)
         if len(self.bird_list.bird_list) > 0:
             self.bird_list.select_random_bird()
             self.current_bird = self.bird_list.current_bird

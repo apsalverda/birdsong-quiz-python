@@ -11,7 +11,7 @@ In the folder with the app, create a folder named "sounds". Copy all audio files
 The app creates a set of all recordings in the `/sounds` folder and plays a randomly selected recording.
 If you want to hear the recording again, click `Repeat`.
 Once you think you know which species you are listening to, click `Reveal` to show a picture of the species along with its name and additional information.
-You can evaluate your response by clicking on an emoji, and the app will track your percentage correct score. (If you don't want to evaluate your current response, click `Next`.)
+You can evaluate your response by clicking on an emoji, and the app will track your percentage correct score. (If you don't want to evaluate your current response, click `Skip`.)
 If you indicate that your response is correct, the recording is removed from the set of recordings.
 When no recordings are left, the app will start over by repopulating the set of recordings and give you the option to reset your score.
 
