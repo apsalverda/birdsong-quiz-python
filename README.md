@@ -17,4 +17,4 @@ When no recordings are left, the app will start over by repopulating the set of 
 
 Audio files purchased from the Macauley Library contain metadata, including a picture, common name, Latin name, place of recording, and recording artist. The app pulls this information directly from the sound file and presents it on screen. The app therefore only needs the soundfile as input. You can easily make custom quizzes (e.g. Spring migration warblers in your area) by only including a relevant subset of soundfiles in the `sounds/` folder.
 
-![](app-screenshot.png)
+![](app-screenshot-new.png)
