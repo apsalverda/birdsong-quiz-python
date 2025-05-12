@@ -86,7 +86,7 @@ class QuizScreen(tk.Tk):
        # buttons
         self.next_button = tk.Button(text = "Skip", command = self.next_bird)
         self.next_button.grid(row = 5, column = 2)
-        self.reveal_button = tk.Button(text = "Reveal", command = self.show_image)
+        self.reveal_button = tk.Button(text = "Reveal image", width = 8, command = self.show_image)
         self.reveal_button.grid(row = 5, column = 1)
         self.repeat_button = tk.Button(text = "Repeat", command = self.play_birdsong)
         self.repeat_button.grid(row = 5, column = 0, pady = 10)
@@ -119,13 +119,14 @@ class QuizScreen(tk.Tk):
         self.label_image.configure(image = self.tk_img)
         self.label_image.grid(row = 1, column = 0, columnspan = 3)
         self.label_image.update()
-        self.reveal_button.grid_remove()
-        self.reveal_button.update()
-        time.sleep(2)
-        self.label_common_name.configure(text=bird_name_from_filename(self.current_bird))
-        self.label_latin_name.configure(text=self.latin_name)
-        self.label_credits.config(text=f"Recorded in {self.recording_place} by {self.recording_artist}\nMacaulay Library, {self.recording_id}")
+        self.reveal_button.configure(text = "Reveal Info", command = self.show_info)
         self.show_response_buttons()
+
+    def show_info(self):
+        self.label_common_name.configure(text = bird_name_from_filename(self.current_bird))
+        self.label_latin_name.configure(text = self.latin_name)
+        self.label_credits.config(text = f"Recorded in {self.recording_place} by {self.recording_artist}\nMacaulay Library, {self.recording_id}")
+        self.reveal_button.configure(text = "(evaluate)", fg = "gray", command = None)
 
 
     def hide_image(self):
@@ -183,7 +184,7 @@ class QuizScreen(tk.Tk):
 
     def next_bird(self):
         self.update_percentage_score()
-        self.reveal_button.grid(row = 5, column = 1)
+        self.reveal_button.configure(text = "Reveal image", fg = "black", command = self.show_image)
         if len(self.bird_list.bird_list) > 0:
             self.bird_list.select_random_bird()
             self.current_bird = self.bird_list.current_bird
@@ -201,7 +202,6 @@ class QuizScreen(tk.Tk):
 
 
 if __name__ == "__main__":
-
     birdList = BirdList()
     birdList.print_bird_list()
     birdList.select_random_bird()
