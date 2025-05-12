@@ -1,7 +1,6 @@
 import os
 import io
 import glob
-import time
 import random
 import re
 import tkinter as tk
@@ -19,7 +18,7 @@ def bird_name_from_filename(mp3_filename):
     bird_name = (re.search(r'/([^/0-9]+)\s*\d', mp3_filename))
     return bird_name.group(1).strip()
 
-class BirdList():
+class BirdList:
 
     def __init__(self):
         self.original_bird_list = sorted(glob.glob(os.path.join("sounds", '*.mp3')))
@@ -28,7 +27,7 @@ class BirdList():
 
 
     def print_bird_list(self):
-        print(f"Soundfiles:\n  {"\n  ".join(self.bird_list)}\n{len(self.bird_list)} birds in total.")
+        print(f"Sound files:\n  {"\n  ".join(self.bird_list)}\n{len(self.bird_list)} birds in total.")
 
 
     def reset_bird_list(self):
@@ -36,7 +35,12 @@ class BirdList():
 
 
     def select_random_bird(self):
-        self.current_bird = random.choice(self.bird_list)
+        randomly_selected_bird = random.choice(self.bird_list)
+        if len(self.bird_list) > 1:
+            # avoid same recording twice in a row
+            if randomly_selected_bird == self.current_bird:
+                self.select_random_bird()
+        self.current_bird = randomly_selected_bird
 
 
     def remove_bird(self, bird):
