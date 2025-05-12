@@ -35,12 +35,12 @@ class BirdList:
 
 
     def select_random_bird(self):
-        randomly_selected_bird = random.choice(self.bird_list)
+        self.randomly_selected_bird = random.choice(self.bird_list)
         if len(self.bird_list) > 1:
             # avoid same recording twice in a row
-            if randomly_selected_bird == self.current_bird:
+            if self.randomly_selected_bird == self.current_bird:
                 self.select_random_bird()
-        self.current_bird = randomly_selected_bird
+        self.current_bird = self.randomly_selected_bird
 
 
     def remove_bird(self, bird):
