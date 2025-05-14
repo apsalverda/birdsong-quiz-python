@@ -3,16 +3,18 @@ import io
 import glob
 import random
 import re
+import pygame
 import tkinter as tk
 from tkinter import messagebox
-import pygame
 from PIL import Image, ImageTk
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
+from datetime import datetime
 
 CORRECT_EMOJI = "😀"
 INCORRECT_EMOJI = "😭"
 BIRD_EMOJI = "🐦‍⬛"
+SOUNDS_PATH = "sounds"
 
 def bird_name_from_filename(mp3_filename):
     bird_name = (re.search(r'/([^/0-9]+)\s*\d', mp3_filename))
@@ -23,7 +25,9 @@ class BirdList:
     def __init__(self):
         self.original_bird_list = sorted(glob.glob(os.path.join("sounds", '*.mp3')))
         self.bird_list = self.original_bird_list.copy()
+        self.randomly_selected_bird = None
         self.current_bird = None
+        self.missing_metadata = []
 
 
     def print_bird_list(self):
@@ -45,6 +49,50 @@ class BirdList:
 
     def remove_bird(self, bird):
         self.bird_list.remove(bird)
+
+
+    def check_list(self):
+        with open("sounds-check.log", "w") as check_log:
+            check_log.write("Sound files with missing metadata on " + str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + "\nNote that these sound files will be excluded from the quiz.\n\n")
+        def remove_item(remove_sound_file, message):
+            print(remove_sound_file + ": " + message)
+            if remove_sound_file in self.bird_list:
+                self.missing_metadata.append(remove_sound_file)
+                self.bird_list.remove(remove_sound_file)
+            with open("sounds-check.log", "a") as check_log:
+                check_log.write(remove_sound_file + ": " + message + "\n")
+
+        for sound_file in self.bird_list:
+            audio = ID3(sound_file)
+            picture = None
+            for tag in audio.getall("APIC"):
+                picture = tag
+                break
+            if not picture:
+                remove_item(sound_file, "Picture is missing")
+            audiofile = MP3(sound_file)
+            try:
+                metadata = audiofile.tags.get("COMM::ENG")[0]
+            except TypeError:
+                remove_item(sound_file, "COMM:ENG is missing")
+            else:
+                metadata_list = [item.strip() for item in metadata.split(";")]
+                try:
+                    latin_name = metadata_list[0]
+                except IndexError:
+                    remove_item(sound_file, "[0] Latin name is missing")
+                try:
+                    recording_place = metadata_list[1]
+                except IndexError:
+                    remove_item(sound_file, "[1] Recording place is missing")
+                try:
+                    recording_artist = metadata_list[2]
+                except IndexError:
+                    remove_item(sound_file, "[2] Recording artist is missing")
+                try:
+                    recording_id = metadata_list[3]
+                except IndexError:
+                    remove_item(sound_file, "[3] Recording ID is missing")
 
 
 class QuizScreen(tk.Tk):
@@ -96,7 +144,10 @@ class QuizScreen(tk.Tk):
         self.repeat_button.grid(row = 5, column = 0, pady = 10)
         self.correct_button = tk.Button(text = CORRECT_EMOJI, command = self.correct)
         self.incorrect_button = tk.Button(text = INCORRECT_EMOJI, command = self.incorrect)
-
+        self.latin_name = None
+        self.recording_place = None
+        self.recording_artist = None
+        self.recording_id = None
 
     def load_image(self):
         audio = ID3(self.current_bird)
@@ -108,8 +159,6 @@ class QuizScreen(tk.Tk):
             image_data = io.BytesIO(picture.data)
             img = Image.open(image_data)
             self.tk_img = ImageTk.PhotoImage(img)
-        else:
-            tk.messagebox.showinfo(message = "No image available for this recording")
         audiofile = MP3(self.current_bird)
         metadata = audiofile.tags.get("COMM::ENG")[0]
         metadata_list = [item.strip() for item in metadata.split(";")]
@@ -200,17 +249,30 @@ class QuizScreen(tk.Tk):
             if reset_score:
                 self.n_items = 0
                 self.n_correct = 0
-            print(reset_score)
             self.bird_list.reset_bird_list()
             self.next_bird()
 
+    def missing_metadata(self):
+        if not os.path.exists(SOUNDS_PATH):
+            tk.messagebox.showerror(message = f"The folder \"" + SOUNDS_PATH + "/\" is missing.\n\nThis folder is required for the app to work and should contain the sound files used in the quiz.")
+            exit(1)
+        if not self.bird_list.original_bird_list:
+            tk.messagebox.showerror(message = f"No sound files in folder \"" + SOUNDS_PATH + "\"/.\n\nA compilation of audio files for North America and Canada can be obtained here:\n\nhttps://www.macaulaylibrary.org/product/the-cornell-guide-to-bird-sounds-us-and-canada/")
+            exit(1)
+        if self.bird_list.missing_metadata:
+            if not self.bird_list.bird_list:
+                tk.messagebox.showwarning(message = "None of the sound files in sounds/ have the required metadata.\n\nPlease only use recordings from Cornell Lab of Ornithology's Macauley Library.\n\nA compilation of audio files for North America and Canada can be obtained here:\n\nhttps://www.macaulaylibrary.org/product/the-cornell-guide-to-bird-sounds-us-and-canada/")
+                exit(1)
+            else:
+                tk.messagebox.showerror(message = "Some sound files in sounds/ are missing metadata and will not be included in the quiz.\n\nSee sounds-check.log for details.")
 
 if __name__ == "__main__":
-    birdList = BirdList()
-    birdList.print_bird_list()
-    birdList.select_random_bird()
 
+    birdList = BirdList()
+    birdList.check_list()
     quizScreen = QuizScreen(birdList)
+    quizScreen.missing_metadata()
+    birdList.select_random_bird()
     quizScreen.next_bird()
 
     quizScreen.mainloop()
