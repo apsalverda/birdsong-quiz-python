@@ -15,6 +15,7 @@ CORRECT_EMOJI = "😀"
 INCORRECT_EMOJI = "😭"
 BIRD_EMOJI = "🐦‍⬛"
 SOUNDS_PATH = "sounds"
+SOUNDS_CHECK_LOG_FILENAME = "sounds-check.log"
 
 def bird_name_from_filename(mp3_filename):
     bird_name = (re.search(r'/([^/0-9]+)\s*\d', mp3_filename))
@@ -52,16 +53,16 @@ class BirdList:
 
 
     def check_list(self):
-        with open("sounds-check.log", "w") as check_log:
-            check_log.write("Sound files with missing metadata on " + str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + "\nNote that these sound files will be excluded from the quiz.\n\n")
         def remove_item(remove_sound_file, message):
             print(remove_sound_file + ": " + message)
             if remove_sound_file in self.bird_list:
                 self.missing_metadata.append(remove_sound_file)
                 self.bird_list.remove(remove_sound_file)
-            with open("sounds-check.log", "a") as check_log:
+            with open(SOUNDS_CHECK_LOG_FILENAME, "a") as check_log:
                 check_log.write(remove_sound_file + ": " + message + "\n")
 
+        with open(SOUNDS_CHECK_LOG_FILENAME, "w") as check_log:
+            check_log.write("Sound files with missing metadata on " + str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + "\nNote that these sound files will be excluded from the quiz.\n\n")
         for sound_file in self.bird_list:
             audio = ID3(sound_file)
             picture = None
@@ -76,23 +77,13 @@ class BirdList:
             except TypeError:
                 remove_item(sound_file, "COMM:ENG is missing")
             else:
+                metadata_items = ["[0] Latin name is missing", "[1] Recording place is missing", "[2] Recording artist is missing", "[3] Recording ID is missing"]
                 metadata_list = [item.strip() for item in metadata.split(";")]
-                try:
-                    latin_name = metadata_list[0]
-                except IndexError:
-                    remove_item(sound_file, "[0] Latin name is missing")
-                try:
-                    recording_place = metadata_list[1]
-                except IndexError:
-                    remove_item(sound_file, "[1] Recording place is missing")
-                try:
-                    recording_artist = metadata_list[2]
-                except IndexError:
-                    remove_item(sound_file, "[2] Recording artist is missing")
-                try:
-                    recording_id = metadata_list[3]
-                except IndexError:
-                    remove_item(sound_file, "[3] Recording ID is missing")
+                for _ in range(0, 3):
+                    try:
+                        metadata_list[_]
+                    except IndexError:
+                        remove_item(sound_file, metadata_items[_])
 
 
 class QuizScreen(tk.Tk):
@@ -220,8 +211,8 @@ class QuizScreen(tk.Tk):
         percentage_score_img = Image.new('RGBA', (length, 10), (112, 198, 135))
         self.percentage_score_tk_img = ImageTk.PhotoImage(percentage_score_img)
         self.percentage_score_image = tk.Label(self)
-        self.percentage_score_image.configure(image=self.percentage_score_tk_img)
-        self.percentage_score_image.grid(row=7, column=0, columnspan=3, sticky = "w")
+        self.percentage_score_image.configure(image= self.percentage_score_tk_img)
+        self.percentage_score_image.grid(row = 7, column = 0, columnspan = 3, sticky = "w")
         self.label_birds_remaining.configure(text = f"{BIRD_EMOJI} {len(self.bird_list.bird_list)}")
 
 
