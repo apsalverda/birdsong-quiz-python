@@ -126,7 +126,7 @@ class QuizScreen(tk.Tk):
         self.label_credits.grid(row = 4, column = 0, columnspan = 3, pady = (0, 5))
         self.label_birds_remaining = tk.Label(font = ("Helvetica", 12, "normal"))
         self.label_birds_remaining.grid(row = 8, column = 1, pady = 10)
-       # buttons
+        # buttons
         self.next_button = tk.Button(text = "Skip", command = self.next_bird)
         self.next_button.grid(row = 5, column = 2)
         self.reveal_button = tk.Button(text = "Reveal image", width = 8, command = self.show_image)
@@ -135,6 +135,7 @@ class QuizScreen(tk.Tk):
         self.repeat_button.grid(row = 5, column = 0, pady = 10)
         self.correct_button = tk.Button(text = CORRECT_EMOJI, command = self.correct)
         self.incorrect_button = tk.Button(text = INCORRECT_EMOJI, command = self.incorrect)
+        # metadata
         self.latin_name = None
         self.recording_place = None
         self.recording_artist = None
@@ -211,7 +212,7 @@ class QuizScreen(tk.Tk):
         percentage_score_img = Image.new('RGBA', (length, 10), (112, 198, 135))
         self.percentage_score_tk_img = ImageTk.PhotoImage(percentage_score_img)
         self.percentage_score_image = tk.Label(self)
-        self.percentage_score_image.configure(image= self.percentage_score_tk_img)
+        self.percentage_score_image.configure(image = self.percentage_score_tk_img)
         self.percentage_score_image.grid(row = 7, column = 0, columnspan = 3, sticky = "w")
         self.label_birds_remaining.configure(text = f"{BIRD_EMOJI} {len(self.bird_list.bird_list)}")
 
