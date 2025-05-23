@@ -6,7 +6,7 @@ This app allows you to practice identifying birds by ear using recordings from [
 
 **The app requires audio files purchased from Cornell Lab of Ornithology's Macauley library.**
 A set of 4,954 MP3 audio files covering the United States and Canada can be downloaded [here](https://www.macaulaylibrary.org/product/the-cornell-guide-to-bird-sounds-us-and-canada/).
-In the folder with the app, create a folder named "sounds". Copy all audio files (.mp3s) that you want to use for practice to this folder.
+In the folder where the app is located, create a folder named "sounds". Copy all audio files that you want to use for practice to this folder.
 (Note that you can copy a subset of a larger set of audio files to the folder to practice just that subset of recordings.)
 
 ### how the app works
